@@ -1,0 +1,9 @@
+model{
+	for (i in 1:N){
+		y[i] ~ dnorm(mu + b*x[i], tau_r)
+	}
+
+	mu ~ dnorm(0, .1)
+	b ~ dnorm(0, .1)
+    tau_r ~ dgamma(1,1)
+}

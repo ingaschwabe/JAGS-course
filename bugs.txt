@@ -1,0 +1,10 @@
+model{
+	for (i in 1:N){
+		y[i] ~ dnorm(y_hat[i], tau_r)
+		y_hat[i] <- mu + b*x[i]
+	}
+
+	mu ~ dnorm(0, .1)
+	b ~ dnorm(0, .1)
+    tau_r ~ dgamma(1,1)
+}
