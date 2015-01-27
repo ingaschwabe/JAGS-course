@@ -1,0 +1,64 @@
+model{
+
+##MZ twins
+for (fam in 1:n_mz){
+  c_mz[fam] ~ dnorm(mu, tau_c)
+  f_mz[fam] ~ dnorm(c_mz[fam], tau_a) 
+  
+ for (twin in 1:2){
+   pheno_mz[fam,twin]~ dnorm(f_mz[fam],tau_e)   
+  }
+   		
+#1pl model twin1
+ for (k in 1:n_items){
+   logit(p[fam,k]) <- pheno_mz[fam,1] - b[k]
+   Ymz[fam,k] ~ dbern(p[fam,k])
+  }   		
+
+#1pl model twin2
+ for (k in (n_items+1):(2*n_items)){
+	 logit(p[fam,k]) <- pheno_mz[fam,2] - b[k-n_items]
+	 Ymz[fam,k] ~ dbern(p[fam,k])
+ }
+}
+
+##DZ twins
+for (fam in 1:n_dz){
+  c_dz[fam] ~ dnorm(mu, tau_c)
+  f0_dz[fam] ~ dnorm(c_dz[fam], doubletau_a)
+				
+ for (twin in 1:2){										
+	 f_dz[fam,twin] ~ dnorm(f0_dz[fam], doubletau_a)
+	 pheno_dz[fam,twin] ~ dnorm(f_dz[fam,twin], 
+                              tau_e)
+ }
+
+
+#1pl model twin1 (DZ)
+ for (k in 1:n_items){
+  logit(p2[fam,k]) <- pheno_dz[fam,1] - b[k]
+   Ydz[fam,k] ~ dbern(p2[fam,k])
+ }
+
+#1pl model twin2 (DZ)
+ for (k in (n_items+1):(2*n_items)){
+	 logit(p2[fam,k]) <- pheno_dz[fam,2] - b[k-n_items]
+	 Ydz[fam,k] ~ dbern(p2[fam,k])
+	}
+
+}
+
+mu <- 0
+doubletau_a <- 2*tau_a
+
+#Priors
+for (i in 1:n_items){
+    b[i] ~ dnorm(0, .1)
+
+}
+
+
+tau_a ~ dgamma(1,1)   
+tau_c ~ dgamma(1,.5)
+tau_e ~ dgamma(1,1)
+}
